@@ -10,6 +10,17 @@
 This is a python module to ease the shell command executions. In this file, common actions
 will be provided according to the coding style of the developer.
 ---------------------------------------------------------------------------------------------
+Two usage of this class supported:
+	-- one instance for one command, that require the user to set the command string when this
+class is instantiated. By this way, the get_output and get_result API can get the
+corresponding value by executing the command once. All result will be stored in class after
+the command executed.
+	-- the other usage is one instance for multiple commands, the caller should input the cmd
+when calling get_output, get_result, and the corresponding command will be executed seperately.
+
+The two usage are specified when in instantiating. If the cmd is not specified in instantiating,
+then the instance will enter the second usage, else will enter the first usage.
+---------------------------------------------------------------------------------------------
 """
 
 import subprocess;
@@ -20,8 +31,23 @@ class shell: ## {
 	## this var indicates the command string used by current class.
 	__cmd = None;
 
+	## the string value determined by the internal class within 'OO' and 'OM'.
+	## 'OO': one instance for one command mode.
+	## 'OM': one instance for multiple commands mode, this is the default mode
+	__mode = 'OM';
+
+	## var valid only in 'OO' mode, to specify if the command is executed or not, if is True, then
+	## calling get_output or get_result will not execute the command.
+	##
+	__executed = False;
+
+	## TODO
+
 	def __init__(self, cmd = None): ## {
 		self.__cmd = cmd;
+		if not cmd: self.__mode = 'OM'; ## if the cmd is None, the mode is OM
+		else: self.__mode = 'OO'; ## else if the cmd is not None, the mode is OO.
+		return;
 	## }
 
 	## an API to get the output information of target shell command.

@@ -52,7 +52,7 @@ class shell: ## {
 			## the privative member
 			obj = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);
 			self.__sh_rst = obj.wait(); ## store the result to corresponding member
-			self.__out    = self.__out_formated(obj.readlines()); ## store the stdout or stderr to corresponding member
+			self.__out    = self.__out_formated(obj.stdout.readlines()); ## store the stdout or stderr to corresponding member
 		## }
 		return;
 	## }
@@ -75,10 +75,10 @@ class shell: ## {
 		## }
 		else: ## {
 			## in OM mode, first to check the cmd
-			self.__check_cmd(self,cmd); ## if cmd is None, this func. will terminated the whole program with PE.
+			self.__check_cmd(cmd); ## if cmd is None, this func. will terminated the whole program with PE.
 			## else, to do the shell command
 			obj = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);
-			return self.__out_formated(obj.readlines());
+			return self.__out_formated(obj.stdout.readlines());
 		## }
 	## }
 
@@ -99,7 +99,7 @@ class shell: ## {
 		## }
 		else: ## {
 			## in OM mode, first to check the cmd
-			self.__check_cmd(self,cmd); ## if cmd is None, then this program will terminate the program
+			self.__check_cmd(cmd); ## if cmd is None, then this program will terminate the program
 			obj = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);
 			return obj.wait(); ## return the result by calling wait.
 		## }

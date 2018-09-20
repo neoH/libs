@@ -36,17 +36,24 @@ class shell: ## {
 	## 'OM': one instance for multiple commands mode, this is the default mode
 	__mode = 'OM';
 
-	## var valid only in 'OO' mode, to specify if the command is executed or not, if is True, then
-	## calling get_output or get_result will not execute the command.
-	##
-	__executed = False;
+	## declare an empty list for storing the executed contents.
+	__out = [];
 
-	## TODO
+	## declared for executed result.
+	__sh_rst = None;
+
 
 	def __init__(self, cmd = None): ## {
 		self.__cmd = cmd;
 		if not cmd: self.__mode = 'OM'; ## if the cmd is None, the mode is OM
-		else: self.__mode = 'OO'; ## else if the cmd is not None, the mode is OO.
+		else: ## {
+			self.__mode = 'OO'; ## else if the cmd is not None, the mode is OO.
+			## in OO mode, the command will be executed when it is instantiated, and the output and result wil be stored in
+			## the privative member
+			obj = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);
+			self.__sh_rst = obj.wait(); ## store the result to corresponding member
+			self.__out    = self.__out_formated(obj.readlines()); ## store the stdout or stderr to corresponding member
+		## }
 		return;
 	## }
 
@@ -56,17 +63,23 @@ class shell: ## {
 	## nomatter what command it is, when calling get_output, only information in output will be captured.
 	##
 	def get_output(self,cmd = None): ## {
-		out_f = None;
-		## step 1. to choose the arg of this function
-		vcmd = self.__get_vld_cmd(cmd);
-		## if program executed here, that means the vcmd is a valid command.
-
-		## step 2. calling shell commands by using the valid cmd
-		obj = subprocess.Popen(vcmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE);
-		obj.wait(); ## wait the command end.
-		(out,err) = obj.communicate(); ## calling this func. to get the command stdout, stderr information.
-		if out != None: out_f = out.decode().strip();  ## format the output information.
-		return out_f; ## return the formatted output.
+		"""
+		.In OO mode, cmd arg will be ignored.
+		.In OM mode, cmd must not None, or will report fatal.
+		.Return type is list, is the formatted output list.
+		"""
+		## judge the __mode first
+		if self.__mode == 'OO': ## {
+			## in OO mode, return the output information in __out
+			return self.__out;
+		## }
+		else: ## {
+			## in OM mode, first to check the cmd
+			self.__check_cmd(self,cmd); ## if cmd is None, this func. will terminated the whole program with PE.
+			## else, to do the shell command
+			obj = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);
+			return self.__out_formated(obj.readlines());
+		## }
 	## }
 
 	## this API to get the result value of input command, also, this func. should first to get the valid
@@ -76,37 +89,44 @@ class shell: ## {
 	## int: the command result.
 	##
 	def get_result(self,cmd = None): ## {
-		sh_rst = 0; ## default result is 0.
-		## step 1. to choose the arg of this func.
-		vcmd = self.__get_vld_cmd(self,cmd);
-		if vcmd == None: return None; ## if vcmd eq None, then return this func.
-		obj = subprocess.Popen(vcmd,shell=True);
-		sh_rst = obj.wait();
-		return sh_rst;
+		"""
+		.In OO mode, cmd arg will be ignored
+		.In OM mode, cmd must not None, or will report fatal
+		.Return type is int
+		"""
+		if self.__mode == 'OO': ## {
+			return self.__sh_rst;
+		## }
+		else: ## {
+			## in OM mode, first to check the cmd
+			self.__check_cmd(self,cmd); ## if cmd is None, then this program will terminate the program
+			obj = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);
+			return obj.wait(); ## return the result by calling wait.
+		## }
 	## }
 
-
-	## a internal func. of this class to get the valid command, if no caller enterred and no class default
-	## command, then the program will exit with a fatal.
-	def __get_vld_cmd(self, cmd): ## {
-		r_cmd = None;
+	## a internal func. of this class to check if the cmd is None, if it is, then report fatal and exit
+	def __check_cmd(self, cmd): ## {
+		"""
+		.No return type.
+		"""
 		if cmd == None: ## {
 			## if cmd is None, then to check the self.__cmd
-			## if self.__cmd is not None, then assign self.__cmd to cmd
-			if self.__cmd == None: ## {
-				## if the command in class is also None, then need to print the PE exit process
-				rpt.fatal("[__get_vld_cmd] fatal occurred in report module, no command found."); ## call func. to report a fatal error.
-				exc.exit_pe();
-			## }
-			else: ## {
-				## else block, if the self.__cmd is not None, but the cmd arg is None, then use self.__cmd
-				##
-				r_cmd = self.__cmd;
-			## }
-		else: return cmd;
+			rpt.fatal("[__check_cmd] fatal occurred in report module, no command found."); ## call func. to report a fatal error.
+			exc.exit_pe();
 		## }
-		return r_cmd; ## return the valid cmd
+		return;
 	## }
 
+	## a internal func. to formated the list contents in out arg.
+	##
+	def __out_formated(self, outs): ## {
+		__out_f = [];
+		for out in outs: ## {
+			## ergodic the outs list.
+			__out_f.append(out.decode().strip());
+		## }
+		return __out_f;
+	## }
 
 ## }

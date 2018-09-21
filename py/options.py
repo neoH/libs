@@ -4,7 +4,15 @@ import re;
 import coms;
 
 """
-This is a class for options check and detect, detailed feature list of this class please see document "Python Library.docx"
+----------------------------------------------------------------------------------------------------
+This is a class for options check and detect, detailed feature list of this
+class please see document "Python Library.docx"
+----------------------------------------------------------------------------------------------------
+inputs:
+	all inputs should be provided when initial the options class.
+----------------------------------------------------------------------------------------------------
+outputs:
+----------------------------------------------------------------------------------------------------
 """
 
 class options:
@@ -77,7 +85,7 @@ class options:
 		headers = self.__opt_head_split__(flag);
 		self.__g_sopts__ = sopts;
 		del argvs[0];
-		
+
 		while len(argvs): ## {
 			argv = argvs.pop(0);
 			if self.__opt_head_match__(argv,headers): ## {
@@ -215,7 +223,7 @@ class options:
 
 	def __opt_head_match__(self,argv,headers):
 		"""
-			This function to detect the option head match information, if matched, then return True, else 
+			This function to detect the option head match information, if matched, then return True, else
 			return False.
 			-------------------------------------------------------------------------------------------------------------------------------------------
 			Args:
@@ -262,7 +270,7 @@ class options:
 
 		## -- Procedure ------------------------------------------------------------------------------------------------------------------------------
 		## 1. check if current opt exists in __g_opts__,
-		## 1.1. if exists, then add the time field: [1], and then check T, if is 'P', then append __g_opts__ 
+		## 1.1. if exists, then add the time field: [1], and then check T, if is 'P', then append __g_opts__
 		## 1.2. else if not exists, then create a new list to add [0] -> 'name', [1] -> 'time', [2] -> 'param'
 		## -------------------------------------------------------------------------------------------------------------------------------------------
 

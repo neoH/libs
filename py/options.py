@@ -41,6 +41,9 @@ class options: ## {
 		## opt_f, a list for specified options, used to check directly with input options.
 		opt_f = self.__get_format_opts(sopts);
 		for argv in argvs: ## {
+			if argv in opt_f: ## {
+				## if current argv in supported formated option.
+			## }
 		## }
 		return;
 	## }

@@ -52,7 +52,8 @@ class options: ## {
 		"""
 		## opt_f, a list for specified options, used to check directly with input options.
 		self.__get_format_opts(sopts);
-		while argv = argvs.pop(): ## {
+		while len(argvs): ## {
+			argv = argvs.pop();
 			## opt_mrst: the result of option matched func.
 			opt_mrst = self.__opt_matched(argv);
 			## if the argv checked, then according to the return type to do following procedure.

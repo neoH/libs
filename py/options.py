@@ -20,6 +20,8 @@ outputs:
 APIs:
 	-- pop_option: pop one option dict handler, which contains the option information.
 ----------------------------------------------------------------------------------------------------
+Exceptions:
+	-- INVOPT, invalid option input,
 ----------------------------------------------------------------------------------------------------
 """
 
@@ -36,19 +38,26 @@ class options: ## {
 
 	## the dict stores user enterred options, its format is:
 	## ['opt_name']:
-	## -> ['num']: number
-	## -> ['param']: parameter
+	## -> [0]:
+	## --> ['index']: number
+	## --> ['param']: parameter
+	## -> [1]:
+	## --> ['index']: number
+	## --> ['param']: parameter
 	__uopts = {};
 
-	def __init__(self,argvs,sopts): ## {
+	__einfo = {
+		'INVOPT': 'invalid option enterred by user',
+	};
+
+	def load(self,argvs,sopts): ## {
 		"""
+		load func. to load and check user enterring, if load success, then return 0, else return -1.
 		the format of sopts is:
 		-- sopts['name']:
 			-> ['param']: parameter of this option
 			-> ['fmt']: format of this option
 			-> ['desc']: description
-		In initial function, the program will get option from argvs list, and then check if support
-		sopts.
 		"""
 		## opt_f, a list for specified options, used to check directly with input options.
 		self.__get_format_opts(sopts);
@@ -67,15 +76,27 @@ class options: ## {
 					## step 1. check the next arg and opt format
 					## step 2. call self.__opt_insert()
 					if sopts[opt_mrst['name']]['param'] != None: ## {
-						## the supported option type has parameter, so if the next item of argvs is not a parameter, then need to report fatal and exit the program.
+						## the supported option type has parameter, so if the next item of argvs is not a parameter,
+						## then need to report fatal and exit the program.
+						nargv = argvs.pop();
+						if nargv[0] == '-' or nargv[0] == '+' or nargv == None: ## {
+							## report && return -1
+							self.__error_rpt('INVOPT'," option: "+argv); return -1;
+						## }
+						else: ## {
+							## else block to set the param to self.__uopts dict.
+							self.__uopt_insert(opt_mrst['name'],nargv);
+						## }
+					## }
+					else: ## {
+						## else if current option has no parameter
+						self.__uopt_insert(opt_mrst['name']); ## call insert with no param arg.
 					## }
 				## }
-				else: ## {
-					##
-				## }
+				else: self.__uopt_insert(opt_mrst['name'],opt_mrst['result']); ## this block indicates the return result contains the parameter
 			## }
 		## }
-		return;
+		return 0;
 	## }
 
 
@@ -158,6 +179,43 @@ class options: ## {
 		## }
 		return;
 	## }
+
+	def __error_rpt(self,ID,ext = ""): ## {
+		"""
+		A func. to print error information according to input error ID and message in class.
+		"""
+		if ID in self.__einfo: print ("options: [*E,"+ID+"] "+self.__einfo[ID]+ext);
+		return;
+	## }
+
+	def __uopt_insert(self,opt,param = None):
+		"""
+		A func. to insert options to self.__uopts according to input args. If input opt already exists, then to
+		add the appearring time, else creating the new list.
+		detailed format of self.__uopts please see field declaration.
+		"""
+
+		uopt_dict = {};
+
+		if opt in self.__uopts: ## {
+			## if opt already exists in __uopts, then to get current index by len(),
+			## and create a new dict and append to __uopts.
+			index = len(self.__uopts[opt]);
+			## create a uopt dict
+			uopt_dict['index'] = index;
+		## }
+		else: ## {
+			## else block, the opt not exists in __uopts, then need to create a new dict item
+			self.__uopts[opt] = []; ## create a new empty list
+			uopt_dict['index'] = 0; ## set the index of opt list to 0.
+		## }
+		uopt_dict['param'] = param;
+		self.__uopts[opt].append(uopt_dict); ## append the dict to the corresponding opt list.
+
+		return; ## return void
+	## }
+
+
 	## ---------------------------------------------------------------------------------------------------- ##
 
 ## }

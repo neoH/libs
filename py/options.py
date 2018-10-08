@@ -130,6 +130,7 @@ class options:
 				## if is ' ' and sp_param is not None, then to get the next argv as param
 				##
 				param = self.__get_param__(opt,argvs);
+				if param == None: return False; ## if get None of param, which means exception occurred, need to return immediately.
 				if param != False: self.__set_fmt_argv__(opt,param); ## call this func. to insert current opt & param into self.__fmt_argvs__
 				else: self.__set_fmt_argv__(opt); ## else insert into argvs without param.
 
@@ -138,10 +139,26 @@ class options:
 
 
 	def __get_param__(self,opt,argvs):
+		"""
+		A internal func. to get parameter from user commond entering, first to search supported type according to input option, then
+		to check parameter type.
+		if param not detected but in support list it has param, then report error and return None.
+		-------------------------------------------------------------------------------------------------------------
+		Return:
+		-- None: exception occurred
+		-- False: current option has no parameter
+		-- string: the param value.
+		-------------------------------------------------------------------------------------------------------------
+		"""
 		if self.__get_sp_param__(opt) != None:
 			if self.__get_sp_suf__(opt) == ' ':
 				## only if the returned sp_param is not None and suffix is ' ', then it means need
 				## to get the next argv as parameter.
+				param = argvs.pop(); ## pop next item from the argvs list.
+				if self.__is_opt__(param):  ## {
+					print (" ERROR, IOPTF: no available parameter detected for option ("+opt+")."); ## print illegal format exception
+					return None;
+				## }
 			else:
 				## else if the suffix is not ' ' and in this block, sp_param is also not None, then to check the remained string of this argv
 

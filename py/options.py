@@ -64,13 +64,17 @@ class options:
 	## the check switch, if this var enabled, then the module will check the argvs in loading,
 	## first of all, if this switch enabled, then all support options must be inserted before load.
 	##
-	__check__ = False;
+	__debug__ = False;
 
-	def __init__(self, chk = False): ## {
+	## unsupported argument list, all args not recognized by this class will be sotred here.
+	##
+	__usp_args__ = [];
+
+	def __init__(self, dbg = False): ## {
 		"""
 		The constructor, to set check switch and instantiate the option class.
 		"""
-		self.__check__ = chk;
+		self.__debug__ = dbg;
 		return;
 	## }
 
@@ -116,29 +120,124 @@ class options:
 		-------------------------------------------------------------------------------------------------------------
 		Exceptions:
 		-- input format illegal, which means if the option has parameter, but no param found in argvs for this option,
-		then the exception will raised. Only valid when __check__ switch is True.
+		then the exception will raised. Only valid when switch is True.
 		-------------------------------------------------------------------------------------------------------------
 		Return:
 		-- True : none exception occur.
 		-- False: exception occurred.
 		-------------------------------------------------------------------------------------------------------------
 		"""
-		for argv_item in argvs:
+		for argv_item in argvs: ## {
 			opt = self.__opt_match__(argv_item);
-			if opt != None:
+			if opt != None: ## {
 				## if opt not None, which means opt matched, then according to the suf,
 				## if is ' ' and sp_param is not None, then to get the next argv as param
 				##
-				param = self.__get_param__(opt,argvs);
+				param = self.__get_param__(opt,argv_item,argvs);
 				if param == None: return False; ## if get None of param, which means exception occurred, need to return immediately.
-				if param != False: self.__set_fmt_argv__(opt,param); ## call this func. to insert current opt & param into self.__fmt_argvs__
-				else: self.__set_fmt_argv__(opt); ## else insert into argvs without param.
+				self.__set_fmt_argv__(opt_param); ## if param == False, that means current option has no parameter.
+			## }
+			else: ## {
+				## else if opt is none, which means current argv not recognized by the sp. list,
+				## these args will be push into the self.__usp_args__, and may probably used by the program.
+				self.__usp_args__.append(argv_item);
+			## }
+		## }
+	## end def }
+
+	def exists(opt): ## {
+		"""
+		Program to check if the given option exists in the __fmt_argvs__, no matter the option with param or no param
+		"""
+
+		if self.__fmt_argvs__.has_key(opt): return True;
+		else: return False;
+
+	## end def }
+
+	def get_param(opt): ## {
+		"""
+		Func. to get the parameter according to input option, this func will first check if the option exists in the __fmt_argvs__,
+		if not exists, then return False, else if get the param, then return the param, and besides, should delete the item in __fmt_argvs__
+		"""
+
+		## first to call exists to check if exists
+		if self.exists(opt): ## {
+			## if exists, then need to get the parameter of this option
+			return self.__fmt_argvs__[opt].pop(); ## return the first item in option list.
+		## }
+		else: return False;
+
+	## end def }
+
+
+	def descript():
+		"""
+		A function to display all supported information, and only display the option information.
+		------------------------------------------------------------------------------------------
+		display format:
+		<prefix>option_name<suffix> <<param>>: <description>
+		"""
+
+		for opt in self.__sp_opts__: ## {
+			## loop for display
+			display_info = opt['pre']+opt['name']+opt['suf'];
+			if opt['param'] != False: display_info += " "+opt['param']; ## if the parameter is not False, then to add param value
+			display_info += ": "+opt['descp'];
+			print (display_info);
+		## }
+
+		return;
+
+	## end def }
+
+
+
+	## APIs definition above
+	## -------------------------------------------------------------------------------------------------------------------- ##
 
 
 
 
+	def __set_fmt_argv__(opt,param = False): ## {
+		"""
+		A func. to set formated args into self.__fmt_argvs__, which is a dict indexed by option name, and stores
+		a list, the list countered the input times by user.
+		"""
+		## step 1. check if the option name already registered
+		if self.__fmt_argvs__.has_key(opt): ## {
+			## if this index has already exists the dict.
+			self.__fmt_argvs__[opt].append(param); ## append the opt list with another param
+		## }
+		else: ## {
+			## else if this index not exists in the dict.
+			opt_list = [param];
+			self.__fmt_argvs__[opt] = opt_list; ## assign a new option list to a newly generated key.
+		## }
+		return; ## return null.
+	## end def }
 
-	def __get_param__(self,opt,argvs):
+
+	def __opt_match__(self,argv): ## {
+		"""
+		A function to match if current argv item matched the option in __sp_opts__ lib.
+		------------------------------------------------------------------------------------------------------------
+		Return:
+		-- if matched, then return the option name.
+		-- else if not matched, then return None.
+		------------------------------------------------------------------------------------------------------------
+		"""
+		for opt_item in self.__sp_opts__: ## {
+			if re.match(opt_item['pre']+opt_item['name']+opt_item['suf'],argv): return opt_item['name']; ## if option matched, then return the option name
+		## }
+		## after looping all, if not returned, then return None to info caller nothing matched.
+		return None;
+
+	## end def }
+
+
+
+	def __get_param__(self,opt,argv,argvs): ## {
 		"""
 		A internal func. to get parameter from user commond entering, first to search supported type according to input option, then
 		to check parameter type.
@@ -150,8 +249,12 @@ class options:
 		-- string: the param value.
 		-------------------------------------------------------------------------------------------------------------
 		"""
-		if self.__get_sp_param__(opt) != None:
-			if self.__get_sp_suf__(opt) == ' ':
+		## __get_sp_param__ is a internal func. to get the parameter value of input option in sp. list.
+		sp_param = self.__get_sp_param__(opt);
+		if sp_param != None: ## {
+			if sp_param == False: return False; ## if current option has no param, then return False directly.
+			suf = self.__get_sp_suf(opt);
+			if suf == ' ': ## {
 				## only if the returned sp_param is not None and suffix is ' ', then it means need
 				## to get the next argv as parameter.
 				param = argvs.pop(); ## pop next item from the argvs list.
@@ -159,8 +262,73 @@ class options:
 					print (" ERROR, IOPTF: no available parameter detected for option ("+opt+")."); ## print illegal format exception
 					return None;
 				## }
-			else:
+				else: return param; ## else the parameter is legal, then to return with parameter
+			## }
+			else: ## {
 				## else if the suffix is not ' ' and in this block, sp_param is also not None, then to check the remained string of this argv
+				obj = re.search(suf,argv);
+				if obj != None: ## {
+					## if the suf matched, then to get remained string
+					param = argv[obj.end():].strip();
+					if param == '': ## {
+						print (" ERROR, IOPTF: no available parameter detected for option ("+opt+")."); ## print illegal format exception
+						return None; ## this means if the param info behind the option sufffix is blank info, then need to return NOne and report error
+					## }
+					else: ## {
+						return param; ## else if the param is not '', then return the param.
+					## }
+				## }
+				else: ## {
+					## if the suffix not matched for this option, also need to return exception.
+					print ("ERROR, IOPTF: no available parameter detected for option ("+opt+").");
+					return None;
+				## }
+			## }
+		## }
+		else: return None; ## else the sp_param is None, which means no option found in __get_sp_param__
+	## end def }
+
+	def __get_sp_param__(opt): ## {
+		"""
+		A func. to return param value in sp. list, the return types are:
+		-- None: if the enterred option not exists in sp list.
+		-- False: if the option exists, but the param type is False.
+		-- string: if the option exists, and the param type is a str.
+		"""
+		for opt_item in self.__sp_opts__: ## {
+			if opt_item['name'] == opt: ## {
+				## if the option name matched, then to return the param value
+				return opt_item['param'];
+			## }
+		## }
+		## after loop all, if the program still not returned, then to return None, which means the option not exists in __sp_opts__
+		return None;
+	## end def }
+
+	def __get_sp_suf__(opt): ## {
+		"""
+		Program similiar with __get_sp_param__
+		-- None: if enterred option not exists in sp list.
+		-- string: if the option exists, and the suf must a str.
+		"""
+		for opt_item in self.__sp_opts__: ## {
+			if opt_item['name'] == opt: ## {
+				## if the option name matched, then to return the suffix value
+				return opt_item['suf'];
+			## }
+		## }
+		## after looping all, if program still executed here, then it means no item founded in __sp_opts__, should return None.
+		return None;
+	## end def }
+
+	def __is_opt__(val): ## {
+		"""
+		Func. to check the input value is with '-' or '+' preffixed.
+		"""
+		if val[0] == '-' or val[0] == '+': return True;
+		else: return False;
+	## end def }
+
 
 
 ## }

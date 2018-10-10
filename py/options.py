@@ -31,7 +31,7 @@ Exceptions:
 import re;
 
 
-class options:
+class options: ## {
 	"""
 	This is a class module for processing options that will be called by other programmer.
 	"""
@@ -74,6 +74,7 @@ class options:
 		"""
 		The constructor, to set check switch and instantiate the option class.
 		"""
+		## this debug is only for option test, when in library usage, this switch will be disabled.
 		self.__dbg__ = dbg;
 		return;
 	## }
@@ -114,7 +115,7 @@ class options:
 	## }
 
 
-	def load (self, argvs):
+	def load (self, argvs): ## {
 		"""
 		An API to load the argvs that input by user who calling the program tool.
 		-------------------------------------------------------------------------------------------------------------
@@ -172,7 +173,7 @@ class options:
 	## end def }
 
 
-	def descript(self):
+	def descript(self): ## {
 		"""
 		A function to display all supported information, and only display the option information.
 		------------------------------------------------------------------------------------------
@@ -186,6 +187,7 @@ class options:
 			if opt['param'] != False: display_info += "<"+opt['param']+">"; ## if the parameter is not False, then to add param value
 			display_info += ": "+opt['descp'];
 			print (display_info);
+			print ("");
 		## }
 
 		return;

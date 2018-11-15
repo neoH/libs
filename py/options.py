@@ -115,7 +115,7 @@ class options: ## {
 	## }
 
 
-	def load (self, argvs): ## {
+	def load (self, sargvs): ## {
 		"""
 		An API to load the argvs that input by user who calling the program tool.
 		-------------------------------------------------------------------------------------------------------------
@@ -128,8 +128,11 @@ class options: ## {
 		-- False: exception occurred.
 		-------------------------------------------------------------------------------------------------------------
 		"""
-		self.__debug_info__("load","drop the program name: "+argvs.pop(0)); ## to pop the invalid item: the tool name first
-		for argv_item in argvs: ## {
+		self.__debug_info__("load","drop the program name: "+sargvs.pop(0)); ## to pop the invalid item: the tool name first
+		argvs = sargvs;
+		##for argv_item in argvs: ## {
+		while len(argvs): ## {
+			argv_item = argvs.pop(0);
 			opt = self.__opt_match__(argv_item);
 			if opt != None: ## {
 				## if opt not None, which means opt matched, then according to the suf,
@@ -166,7 +169,11 @@ class options: ## {
 		## first to call exists to check if exists
 		if self.exists(opt): ## {
 			## if exists, then need to get the parameter of this option
-			return self.__fmt_argvs__[opt].pop(0); ## return the first item in option list.
+			self.__debug_info__('get_param',"getting one param: "+self.__fmt_argvs__[opt][0]+" of opt: "+opt);
+			item = self.__fmt_argvs__[opt].pop(0); ## return the first item in option list.
+			## check, if len of current opt is 0, then need to delete this item of dict
+			if len(self.__fmt_argvs__[opt]) == 0: del self.__fmt_argvs__[opt]; ## if len of this opt is 0, then to delete this key
+			return item;
 		## }
 		else: return False;
 
@@ -211,9 +218,11 @@ class options: ## {
 		if opt in self.__fmt_argvs__: ## {
 			## if this index has already exists the dict.
 			self.__fmt_argvs__[opt].append(param); ## append the opt list with another param
+			self.__debug_info__('__set_fmt_argv__',"inserting format param: "+param);
 		## }
 		else: ## {
 			## else if this index not exists in the dict.
+			self.__debug_info__('__set_fmt_argv__',"adding a new format param: "+param);
 			opt_list = [param];
 			self.__fmt_argvs__[opt] = opt_list; ## assign a new option list to a newly generated key.
 		## }
@@ -265,7 +274,7 @@ class options: ## {
 		sp_param = self.__get_sp_param__(opt);
 		if sp_param != None: ## {
 			if sp_param == False: return False; ## if current option has no param, then return False directly.
-			suf = self.__get_sp_suf(opt);
+			suf = self.__get_sp_suf__(opt);
 			if suf == ' ': ## {
 				## only if the returned sp_param is not None and suffix is ' ', then it means need
 				## to get the next argv as parameter.
@@ -326,6 +335,7 @@ class options: ## {
 		for opt_item in self.__sp_opts__: ## {
 			if opt_item['name'] == opt: ## {
 				## if the option name matched, then to return the suffix value
+				## debug: print("opt_item: "+opt_item['name']+", suf: "+opt_item['suf']+"end");
 				return opt_item['suf'];
 			## }
 		## }

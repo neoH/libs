@@ -1969,6 +1969,8 @@ syn match   UVMType "\<uvm_vreg_field_cb_iter\>"
 syn match   UVMType "\<uvm_wait_op\>"
 
 " UVM Variables
+syn match   UVMVariable "\<raise_objection\>"
+syn match   UVMVariable "\<drop_objection\>"
 syn match   UVMVariable "\<abstract\>"
 syn match   UVMVariable "\<abstractions\>"
 syn match   UVMVariable "\<adapter\>"

@@ -2322,7 +2322,7 @@ if version >= 508 || !exists("did_systemverilog_syn_inits")
     hi link UVMType                      Type
     hi link UVMVariable                  Identifier
     hi link UVMConstant                  Constant
-    hi link UVMPort                      Identifier
+    hi link UVMPort                      Underlined
     hi link UVMRootMethod                Delimiter
 
     delcommand HiLink

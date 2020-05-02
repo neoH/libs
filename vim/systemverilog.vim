@@ -103,7 +103,7 @@ syn match   systemverilogNumber "\<[0-9_]\+\([munpf]\|\)s\>"
 syn match   systemverilogNumber "\<[0-9_]\+step\>"
 
 " Original systemverilog syntax below here
-syn keyword systemverilogTodo contained TODO
+syn keyword systemverilogTodo contained TODO HIGHLIGHT
 syn match   systemverilogOperator "[&|~><!)(*#%@+/=?:;}{,.\^\-\[\]]"
 syn region  systemverilogComment start="/\*" end="\*/" contains=systemverilogTodo
 syn match   systemverilogComment "//.*" contains=systemverilogTodo
@@ -1026,12 +1026,16 @@ syn match   VMMMethod "\<get_ms_scenario_name\>"
 syn match   VMMMethod "\<get_n_insts\>"
 syn match   VMMMethod "\<get_n_scenarios\>"
 syn match   VMMMethod "\<get_name\>"
+syn match   VMMMethod "\<get_type_name\>"
 syn match   VMMMethod "\<get_names_by_channel\>"
 syn match   VMMMethod "\<get_names_by_ms_scenario\>"
 syn match   VMMMethod "\<get_names_by_ms_scenario_gen\>"
 syn match   VMMMethod "\<get_names_by_scenario\>"
 syn match   VMMMethod "\<get_namespaces\>"
 syn match   VMMMethod "\<get_next_cmd\>"
+syn match   VMMMethod "\<get_next_item\>"
+syn match   VMMMethod "\<try_next_item\>"
+syn match   VMMMethod "\<item_done\>"
 syn match   VMMMethod "\<get_next_phase_name\>"
 syn match   VMMMethod "\<get_notification\>"
 syn match   VMMMethod "\<get_notify\>"
@@ -2055,16 +2059,14 @@ syn match   UVMVariable "\<reference\>"
 syn match   UVMVariable "\<reg_ap\>"
 syn match   UVMVariable "\<reg_seq\>"
 syn match   UVMVariable "\<reg_seqr\>"
-syn match   UVMVariable "\<req\>"
 syn match   UVMVariable "\<result\>"
 syn match   UVMVariable "\<rg\>"
-syn match   UVMVariable "\<rsp\>"
 syn match   UVMVariable "\<rw_info\>"
 syn match   UVMVariable "\<select_rand\>"
 syn match   UVMVariable "\<select_randc\>"
 syn match   UVMVariable "\<selection_mode\>"
 syn match   UVMVariable "\<separator\>"
-syn match   UVMVariable "\<seq_item_export\>"
+"syn match   UVMVariable "\<seq_item_export\>"
 syn match   UVMVariable "\<sequence_count\>"
 syn match   UVMVariable "\<sequencer\>"
 syn match   UVMVariable "\<sequences_executed\>"
@@ -2260,6 +2262,7 @@ syn match   UVMPort "\<response_ap\>"
 syn match   UVMPort "\<rsp_export\>"
 syn match   UVMPort "\<rsp_port\>"
 syn match   UVMPort "\<seq_item_port\>"
+syn match   UVMPort "\<seq_item_export\>"
 syn match   UVMPort "\<slave_export\>"
 syn match   UVMPort "\<transport_export\>"
 
@@ -2319,7 +2322,7 @@ if version >= 508 || !exists("did_systemverilog_syn_inits")
     hi link UVMType                      Type
     hi link UVMVariable                  Identifier
     hi link UVMConstant                  Constant
-    hi link UVMPort                      Keyword
+    hi link UVMPort                      Identifier
     hi link UVMRootMethod                Delimiter
 
     delcommand HiLink

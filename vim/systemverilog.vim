@@ -52,6 +52,11 @@ syn keyword systemverilogStatement solve before
 syn keyword systemverilogStatement strong0 strong1 supply0 supply1
 
 syn keyword systemverilogBIMethod new randomize self kill status pre_randomize post_randomize
+syn keyword systemverilogBIMethod pop_back pop_front push_back push_front
+syn match systemverilogBIMethod "\<size\s*("me=e-1
+syn match systemverilogBIMethod "\<last\s*("me=e-1
+syn match systemverilogBIMethod "\<first\s*("me=e-1
+syn match systemverilogBIMethod "\<empty\s*("me=e-1
 
 " directive commands, such as define
 " normal define should be declared first, then there will be special macros override this normal
@@ -63,6 +68,7 @@ syn match systemverilogDirectives   "`ifndef\>"
 syn match systemverilogDirectives   "`else\>"
 syn match systemverilogDirectives   "`elsif\>"
 syn match systemverilogDirectives   "`endif\>"
+syn match systemverilogDirectives   "`undef\>"
 syn match systemverilogDirectives   "`timescale\>"
 syn match systemverilogDirectives   "`celldefine\>"
 syn match systemverilogDirectives   "`endcelldefine\>"
@@ -138,7 +144,7 @@ syn keyword systemverilogStatement   atoi atohex atooct atobin atoreal
 " LRM 3.8 events:
 syn keyword systemverilogStatement   triggered
 " LRM 3.10 methods for enumerated types:
-syn keyword systemverilogStatement   first last next prev num name
+syn keyword systemverilogStatement   next prev num name
 " LRM 4.6 Dynamic Arrays:
 syn keyword systemverilogStatement   delete
 " LRM 4.10 Associative Array methods:
@@ -159,8 +165,7 @@ syn keyword systemverilogStatement   get put try_get try_put peek try_peek
 syn keyword systemverilogStatement   await suspend resume
 " LRM Annex D List methods
 syn keyword systemverilogStatement   next prev eq neq data
-syn keyword systemverilogStatement   size empty push_front push_back
-syn keyword systemverilogStatement   front back pop_front pop_back
+syn keyword systemverilogStatement   front back 
 syn keyword systemverilogStatement   start finish insert insert_range
 syn keyword systemverilogStatement   erase erase_range set swap clear purge
 
@@ -170,7 +175,6 @@ syn keyword systemverilogStatement   erase erase_range set swap clear purge
 syn match   systemverilogGlobal "`nounconnected_drive\>"
 syn match   systemverilogGlobal "`resetall\>"
 syn match   systemverilogGlobal "`unconnected_drive\>"
-syn match   systemverilogGlobal "`undef\>"
 syn match   systemverilogGlobal "$[a-zA-Z0-9_]\+\>"
 
 syn match   systemverilogConstant "\<[A-Z][A-Z0-9_]\+\>"
@@ -1119,7 +1123,6 @@ syn match   UVMVariable "\<show_radix\>"
 syn match   UVMVariable "\<show_root\>"
 syn match   UVMVariable "\<show_terminator\>"
 syn match   UVMVariable "\<show_verbosity\>"
-syn match   UVMVariable "\<size\>"
 syn match   UVMVariable "\<slices\>"
 syn match   UVMVariable "\<start_offset\>"
 syn match   UVMVariable "\<status\>"

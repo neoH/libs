@@ -11,75 +11,41 @@
 #define rhstr__h
 
 #include <stdint.h>
+#include "rharr.h"
 
+enum rhstr_pat_enum
+{
+	WILDS,
+	WILDP,
+	ONE
+};
+
+class rhstrPat
+{
+
+	public:
+		rharr *num[];         // pattern for each Pos
+		rhstr_pat_enum pat[]; // pattern type for each Pos
+
+};
 
 class rhstr
 {
 	private:
-		char      *m_str;
-		uint32_t  m_len;
+		char     *_str;
+		uint32_t  _len;
+		rhstrPat  _fpP;
 
 
 	public:
 		rhstr(const char *s);
-		rhstr(char *s);
-		rhstr() {}
-		//copy(rhstr s); // copy string item from another rhstr
+		bool is_match(const char *s);
 
 
 };
 
 
-rhstr::rhstr(const char *s) // {{{
-{
 
-	uint32_t len = 0;
-
-	while (*(s+len) != '\0') {len++;}
-
-	m_str = new char [len];
-	m_len = len;
-
-
-
-	// copy string to m_str
-	len = 0;
-	while (*(s+len) != 0)
-	{
-		*(m_str+len) = *(s+len);
-		len++;
-	}
-
-} // }}}
-
-rhstr::rhstr(char *s) // {{{
-{
-	uint32_t len = 0;
-
-	while (*(s+len) != '\0') {len++;}
-
-	m_str = new char [len];
-	m_len = len;
-
-
-
-	// copy string to m_str
-	len = 0;
-	while (*(s+len) != 0)
-	{
-		*(m_str+len) = *(s+len);
-		len++;
-	}
-
-} // }}}
-
-
-
-
-rhstr::rhstr(char *s)
-{
-
-}
 
 
 #endif

@@ -15,6 +15,29 @@
 
 
 
+void rhstr::_Patparse(char *pP)
+{
+	
+	int i = 0;
+	while (*(pP+i) != '\0')
+	{
+		switch (*(pP+i))
+		{
+			case '\\':
+				// specify the \w, \W, ...
+				i++; // check next char of pattern
+				switch (*(pP+i))
+				{
+					case 'w';
+					break;
+					case 'W';
+					break;
+				}
+			break;
+		}
+	}
+
+}
 
 
 
